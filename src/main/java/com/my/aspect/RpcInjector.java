@@ -1,6 +1,6 @@
-package com.my.aspact;
+package com.my.aspect;
 
-import com.my.aspact.annotations.RpcService;
+import com.my.aspect.annotations.RpcReference;
 import com.my.client.RpcClientProxy;
 import com.my.net.Transporter;
 import com.my.net.transporter.NettyTransporter;
@@ -21,8 +21,8 @@ public class RpcInjector {
         Field[] fields = clazz.getDeclaredFields();
 
         for (Field field : fields) {
-            if (field.isAnnotationPresent(RpcService.class)) {
-                RpcService annotation = field.getAnnotation(RpcService.class);
+            if (field.isAnnotationPresent(RpcReference.class)) {
+                RpcReference annotation = field.getAnnotation(RpcReference.class);
 
                 // 1. 根据注解选择 Transporter
                 Transporter transporter = createTransporter(annotation.transporter());

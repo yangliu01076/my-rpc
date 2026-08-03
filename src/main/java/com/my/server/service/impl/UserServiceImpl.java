@@ -1,6 +1,8 @@
 package com.my.server.service.impl;
 
+import com.my.aspect.annotations.RpcService;
 import com.my.server.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +11,7 @@ import java.util.Map;
  * @author duoyian
  * @date 2026/7/31
  */
+@RpcService
 public class UserServiceImpl implements UserService {
 
     private static final Map<Long, String> USER_MAP = new HashMap<>();

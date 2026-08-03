@@ -18,6 +18,6 @@ public class ServerTest {
 //        RpcServer rpcServer = new RpcServer(new SocketTransporter());
         RpcServer rpcServer = new RpcServer(new NettyTransporter());
         rpcServer.register(userService);
-        rpcServer.start(8080);
+        rpcServer.start(8083);
     }
 }

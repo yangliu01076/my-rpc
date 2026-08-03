@@ -1,4 +1,4 @@
-package com.my.aspact;
+package com.my.aspect;
 
 import com.my.client.RpcClientProxy;
 import com.my.net.transporter.NettyTransporter;

@@ -57,6 +57,12 @@
             <version>1.4.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.7</version> <!-- Spring Boot 2.7.x 通常用的版本 -->
+        </dependency>
+
     </dependencies>
 
 </project>

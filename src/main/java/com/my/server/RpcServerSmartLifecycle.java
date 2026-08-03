@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author duoyian
  * @date 2026/8/3
  */
-@Component
+//@Component
 public class RpcServerSmartLifecycle implements SmartLifecycle {
     private volatile boolean running = false;
     private Thread serverThread;

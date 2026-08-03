@@ -4,12 +4,9 @@ import com.my.net.Transporter;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.Socket;
 import java.util.UUID;
 
 /**
@@ -45,6 +42,15 @@ public class RpcClientProxy implements InvocationHandler {
         request.setParameters(args);
 
         // 2. 发送网络请求并获取结果
-        return transporter.send(host, port, request).getData();
+        RpcResponse response = null;
+        try {
+            response = transporter.send(host, port, request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (response == null || response.getError() != null) {
+            throw new RuntimeException(response != null ? response.getError() : "response is null");
+        }
+        return response.getData();
     }
 }

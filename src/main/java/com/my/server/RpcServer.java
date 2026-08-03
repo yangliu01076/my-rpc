@@ -1,11 +1,11 @@
 package com.my.server;
 
 import com.my.net.Transporter;
-import com.my.net.handler.RequestHandler;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
-import lombok.Data;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,14 +14,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author duoyian
  * @date 2026/7/31
  */
+@Component
 public class RpcServer {
     // 存放接口与实现类的映射 (比如 UserService -> UserServiceImpl)
     private final Map<String, Object> serviceMap = new ConcurrentHashMap<>();
 
-    private final Transporter transporter;
+    @Resource
+    private Transporter transporter;
 
     public RpcServer(Transporter transporter) {
         this.transporter = transporter;
+    }
+
+    public RpcServer() {
     }
 
     // 注册服务

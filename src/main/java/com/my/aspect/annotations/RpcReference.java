@@ -1,4 +1,4 @@
-package com.my.aspact.annotations;
+package com.my.aspect.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RpcService {
+public @interface RpcReference {
     String host() default "127.0.0.1";
-    int port() default 8080;
+    int port() default 8083;
     String transporter() default "netty"; // netty / socket
 }

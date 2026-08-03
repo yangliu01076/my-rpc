@@ -18,6 +18,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author duoyian
  * @date 2026/8/2
  */
+@Component
 public class NettyTransporter implements Transporter {
 
     // 1. 业务线程池共享 (防止高并发下创建过多线程池导致 OOM)
