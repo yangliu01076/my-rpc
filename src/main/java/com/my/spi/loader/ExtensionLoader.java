@@ -21,12 +21,23 @@ public class ExtensionLoader <T> {
     private final ConcurrentHashMap<String, T> cachedInstances = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Class<?>> cachedClasses = new ConcurrentHashMap<>();
 
+    private static final ConcurrentHashMap<Class<?>, ExtensionLoader<?>> extensionLoaderMap = new ConcurrentHashMap<>();
+
     private ExtensionLoader(Class<?> type) {
         this.type = type;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
-        return new ExtensionLoader<>(type);
+        ExtensionLoader<?> extensionLoader = extensionLoaderMap.get(type);
+        if (extensionLoader != null) {
+            System.out.println("ExtensionLoader cached: " + type.getName());
+            return (ExtensionLoader<T>) extensionLoader;
+        }
+        ExtensionLoader<T> tExtensionLoader = new ExtensionLoader<>(type);
+        System.out.println("ExtensionLoader created: " + type.getName());
+        extensionLoaderMap.put(type, tExtensionLoader);
+        return tExtensionLoader;
     }
 
     /**

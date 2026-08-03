@@ -13,6 +13,7 @@ import java.io.IOException;
 public class SpiTest {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         ExtensionLoader<Serialization> loader = ExtensionLoader.getExtensionLoader(Serialization.class);
+        ExtensionLoader<Serialization> loader2 = ExtensionLoader.getExtensionLoader(Serialization.class);
 
         // 按需加载
         Serialization protostuff = loader.getExtension("hessian");
