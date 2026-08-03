@@ -1,6 +1,6 @@
-package com.my.service.impl;
+package com.my.server.service.impl;
 
-import com.my.service.UserService;
+import com.my.server.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;

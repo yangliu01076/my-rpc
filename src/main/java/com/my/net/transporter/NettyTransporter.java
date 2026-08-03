@@ -50,7 +50,7 @@ public class NettyTransporter implements Transporter {
                                     // 处理粘包半包 (长度域解码)
                                     .addLast(new LengthFieldBasedFrameDecoder(65535, 0, 4, 0, 4))
                                     .addLast(new LengthFieldPrepender(4))
-                                    // 对象编解码 (实际生产中可替换为 Protostuff)
+                                    // Protostuff编解码
                                     .addLast(new ProtostuffEncoder())
                                     .addLast(new ProtostuffDecoder())
                                     // 业务处理 Handler

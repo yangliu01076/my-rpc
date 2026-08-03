@@ -1,4 +1,4 @@
-package com.my.service;
+package com.my.server.service;
 
 /**
  * @author duoyian

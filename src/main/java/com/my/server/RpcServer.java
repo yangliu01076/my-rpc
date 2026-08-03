@@ -1,6 +1,5 @@
 package com.my.server;
 
-import com.my.net.ProtocolHandler;
 import com.my.net.Transporter;
 import com.my.net.handler.RequestHandler;
 import com.my.request.RpcRequest;

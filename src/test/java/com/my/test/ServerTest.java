@@ -1,10 +1,9 @@
 package com.my.test;
 
 import com.my.net.transporter.NettyTransporter;
-import com.my.net.transporter.SocketTransporter;
 import com.my.server.RpcServer;
-import com.my.service.UserService;
-import com.my.service.impl.UserServiceImpl;
+import com.my.server.service.UserService;
+import com.my.server.service.impl.UserServiceImpl;
 
 /**
  * @author duoyian
