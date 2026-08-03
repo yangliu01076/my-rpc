@@ -1,6 +1,7 @@
 package com.my.server.core;
 
 import com.my.aspect.annotations.RpcService;
+import com.my.net.config.RpcConfigProperties;
 import com.my.server.RpcServer;
 import com.my.server.service.UserService;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -26,6 +27,9 @@ public class RpcServerBootstrap implements ApplicationListener<ContextRefreshedE
     @Resource
     private RpcServer rpcServer;
 
+    @Resource
+    private RpcConfigProperties rpcConfig;
+
     private final AtomicBoolean started = new AtomicBoolean(false);
 
     @Override
@@ -45,6 +49,6 @@ public class RpcServerBootstrap implements ApplicationListener<ContextRefreshedE
         beans.values().forEach(rpcServer::register);
 
         // 3. 启动 Netty（在新线程中避免阻塞事件总线）
-        new Thread(() -> rpcServer.start(8083), "rpc-server").start();
+        new Thread(() -> rpcServer.start(rpcConfig.getServerPort()), "rpc-server").start();
     }
 }

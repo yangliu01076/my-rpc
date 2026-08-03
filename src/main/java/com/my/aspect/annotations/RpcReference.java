@@ -12,7 +12,4 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RpcReference {
-    String host() default "127.0.0.1";
-    int port() default 8083;
-    String transporter() default "netty"; // netty / socket
 }

@@ -1,6 +1,7 @@
 package com.my.server;
 
 import com.my.net.Transporter;
+import com.my.net.config.RpcConfigProperties;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,9 @@ public class RpcServer {
 
     @Resource
     private Transporter transporter;
+
+    @Resource
+    private RpcConfigProperties rpcConfig;
 
     public RpcServer(Transporter transporter) {
         this.transporter = transporter;

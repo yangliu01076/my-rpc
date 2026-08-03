@@ -1,6 +1,5 @@
 package com.my.client.service.impl;
 
-import com.my.aspect.RpcInjector;
 import com.my.aspect.annotations.RpcReference;
 import com.my.client.service.DemoService;
 import com.my.server.service.UserService;

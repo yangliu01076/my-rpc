@@ -3,6 +3,9 @@ package com.my.net.transporter;
 import com.my.net.Transporter;
 import com.my.net.codec.ProtostuffDecoder;
 import com.my.net.codec.ProtostuffEncoder;
+import com.my.net.codec.SerializationDecoder;
+import com.my.net.codec.SerializationEncoder;
+import com.my.net.config.RpcConfigProperties;
 import com.my.net.handler.RequestHandler;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
@@ -20,6 +23,7 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,10 +40,14 @@ public class NettyTransporter implements Transporter {
     // 1. 业务线程池共享 (防止高并发下创建过多线程池导致 OOM)
     private static final ExecutorService BUSINESS_EXECUTOR = Executors.newCachedThreadPool();
 
+    @Resource
+    private RpcConfigProperties rpcConfig;
+
     @Override
     public void start(int port, RequestHandler handler) {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        String serializationName = rpcConfig.getSerialization();
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -52,9 +60,8 @@ public class NettyTransporter implements Transporter {
                                     // 处理粘包半包 (长度域解码)
                                     .addLast(new LengthFieldBasedFrameDecoder(65535, 0, 4, 0, 4))
                                     .addLast(new LengthFieldPrepender(4))
-                                    // Protostuff编解码
-                                    .addLast(new ProtostuffEncoder())
-                                    .addLast(new ProtostuffDecoder())
+                                    .addLast(new SerializationEncoder(serializationName))
+                                    .addLast(new SerializationDecoder(serializationName))
                                     // 业务处理 Handler
                                     .addLast(new NettyServerHandler(handler));
                         }
@@ -106,6 +113,7 @@ public class NettyTransporter implements Transporter {
 
         // 3. 提前把 NettyClientHandler 放在外面，以便展示给它用户的方法拿结果
         NettyClientHandler clientHandler = new NettyClientHandler();
+        String serializationName = rpcConfig.getSerialization();
 
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -117,8 +125,8 @@ public class NettyTransporter implements Transporter {
                             ch.pipeline()
                                     .addLast(new LengthFieldBasedFrameDecoder(65535, 0, 4, 0, 4))
                                     .addLast(new LengthFieldPrepender(4))
-                                    .addLast(new ProtostuffEncoder())
-                                    .addLast(new ProtostuffDecoder())
+                                    .addLast(new SerializationEncoder(serializationName))
+                                    .addLast(new SerializationDecoder(serializationName))
                                     // 传入获取到的 clientHandler
                                     .addLast(clientHandler);
                         }
@@ -131,10 +139,8 @@ public class NettyTransporter implements Transporter {
             connectFuture.channel().writeAndFlush(request).sync();
 
             // 4. 【核心同步逻辑】：阻塞等待服务端返回，直到响应被放入队列
-            RpcResponse response = (RpcResponse) clientHandler.getResponse(5000); // 等待 5 秒防死锁
-
             // 返回最终真实结果
-            return response;
+            return (RpcResponse) clientHandler.getResponse(5000);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

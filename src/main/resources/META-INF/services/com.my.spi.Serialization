@@ -1,0 +1,3 @@
+protostuff=com.my.spi.impl.ProtostuffSerialization
+jdk=com.my.spi.impl.JdkSerialization
+hessian=com.my.spi.impl.HessianSerialization

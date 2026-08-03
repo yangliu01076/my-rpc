@@ -63,6 +63,12 @@
             <version>1.9.7</version> <!-- Spring Boot 2.7.x 通常用的版本 -->
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>hessian-lite</artifactId>
+            <version>3.2.13</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -3,6 +3,7 @@ package com.my.client.support;
 import com.my.aspect.annotations.RpcReference;
 import com.my.client.RpcClientProxy;
 import com.my.net.Transporter;
+import com.my.net.config.RpcConfigProperties;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -21,6 +22,9 @@ public class RpcReferenceBeanPostProcessor implements BeanPostProcessor {
     @Resource
     private Transporter transporter;
 
+    @Resource
+    private RpcConfigProperties rpcConfig;
+
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
@@ -38,9 +42,8 @@ public class RpcReferenceBeanPostProcessor implements BeanPostProcessor {
 
     private void injectRpcProxy(Object bean, Field field) {
         try {
-            RpcReference annotation = field.getAnnotation(RpcReference.class);
-            String host = annotation.host();
-            int port = annotation.port();
+            String host = rpcConfig.getHost();
+            int port = rpcConfig.getServerPort();
             RpcClientProxy proxy = new RpcClientProxy(transporter, host, port);
             Class<?> type = field.getType();
             Object proxyInstance = proxy.getProxy(type);

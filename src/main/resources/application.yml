@@ -1,0 +1,5 @@
+rpc:
+  serialization: protostuff
+  serverPort: 8083
+  clientTimeout: 5000
+  host: 127.0.0.1
