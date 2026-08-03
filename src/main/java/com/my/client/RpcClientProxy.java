@@ -1,5 +1,6 @@
 package com.my.client;
 
+import com.my.net.Transporter;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
 
@@ -16,10 +17,13 @@ import java.util.UUID;
  * @date 2026/7/31
  */
 public class RpcClientProxy implements InvocationHandler {
+
+    private final Transporter transporter;
     private final String host;
     private final int port;
 
-    public RpcClientProxy(String host, int port) {
+    public RpcClientProxy(Transporter transporter, String host, int port) {
+        this.transporter = transporter;
         this.host = host;
         this.port = port;
     }
@@ -41,18 +45,6 @@ public class RpcClientProxy implements InvocationHandler {
         request.setParameters(args);
 
         // 2. 发送网络请求并获取结果
-        try (Socket socket = new Socket(host, port);
-             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream input = new ObjectInputStream(socket.getInputStream())) {
-
-            output.writeObject(request);
-
-            // 3. 读取响应
-            RpcResponse response = (RpcResponse) input.readObject();
-            if (response.getError() != null) {
-                throw new RuntimeException(response.getError());
-            }
-            return response.getData();
-        }
+        return transporter.send(host, port, request).getData();
     }
 }

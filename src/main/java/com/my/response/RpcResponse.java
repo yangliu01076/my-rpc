@@ -15,4 +15,18 @@ public class RpcResponse implements java.io.Serializable {
     private Object data;       // 真实返回结果
 
     private String error;      // 异常信息
+
+    public static RpcResponse success(String requestId, Object data) {
+        RpcResponse response = new RpcResponse();
+        response.setRequestId(requestId);
+        response.setData(data);
+        return response;
+    }
+
+    public static RpcResponse fail(String requestId, String error) {
+        RpcResponse response = new RpcResponse();
+        response.setRequestId(requestId);
+        response.setError(error);
+        return response;
+    }
 }

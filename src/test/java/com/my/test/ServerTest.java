@@ -1,5 +1,7 @@
 package com.my.test;
 
+import com.my.net.transporter.NettyTransporter;
+import com.my.net.transporter.SocketTransporter;
 import com.my.server.RpcServer;
 import com.my.service.UserService;
 import com.my.service.impl.UserServiceImpl;
@@ -14,7 +16,8 @@ public class ServerTest {
         // 实现类
         UserService userService = new UserServiceImpl();
 
-        RpcServer rpcServer = new RpcServer();
+//        RpcServer rpcServer = new RpcServer(new SocketTransporter());
+        RpcServer rpcServer = new RpcServer(new NettyTransporter());
         rpcServer.register(userService);
         rpcServer.start(8080);
     }

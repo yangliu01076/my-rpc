@@ -1,14 +1,13 @@
 package com.my.server;
 
+import com.my.net.ProtocolHandler;
+import com.my.net.Transporter;
+import com.my.net.handler.RequestHandler;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
+import lombok.Data;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +18,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RpcServer {
     // 存放接口与实现类的映射 (比如 UserService -> UserServiceImpl)
     private final Map<String, Object> serviceMap = new ConcurrentHashMap<>();
+
+    private final Transporter transporter;
+
+    public RpcServer(Transporter transporter) {
+        this.transporter = transporter;
+    }
 
     // 注册服务
     public void register(Object service) {
@@ -32,37 +37,18 @@ public class RpcServer {
 
     // 启动网络服务监听
     public void start(int port) {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("RPC Server 启动成功，监听端口: " + port);
-            while (true) {
-                // 阻塞等待连接 (为了简易，这里直接 new Thread，实际要用线程池)
-                Socket socket = serverSocket.accept();
-                new Thread(() -> handleRequest(socket)).start();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // RpcServer 把网络请求委托给 transporter 的处理器
+        transporter.start(port, this::handleRequest);
     }
 
-    private void handleRequest(Socket socket) {
-        try (ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream())) {
-
-            // 1. 读取请求
-            RpcRequest request = (RpcRequest) input.readObject();
-
-            // 2. 反射调用本地实现类
+    private RpcResponse handleRequest(RpcRequest request) {
+        try {
             Object result = invoke(request);
-
-            // 3. 封装响应
-            RpcResponse response = new RpcResponse();
-            response.setRequestId(request.getRequestId());
-            response.setData(result);
-
-            // 4. 写回结果
-            output.writeObject(response);
+            return RpcResponse.success(request.getRequestId(), result);
         } catch (Exception e) {
-            e.printStackTrace();
+            RpcResponse resp = new RpcResponse();
+            resp.setError(e.getMessage());
+            return resp;
         }
     }
 

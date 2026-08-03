@@ -1,5 +1,6 @@
 package com.my.net;
 
+import com.my.net.handler.RequestHandler;
 import com.my.request.RpcRequest;
 import com.my.response.RpcResponse;
 
@@ -11,7 +12,7 @@ public interface Transporter {
     /**
      * 启动服务端，绑定端口并监听
      */
-    void start(String host, int port, RequestHandler handler);
+    void start(int port, RequestHandler handler);
 
     /**
      * 客户端发送请求
