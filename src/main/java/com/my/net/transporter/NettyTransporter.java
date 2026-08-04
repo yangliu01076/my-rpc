@@ -1,5 +1,6 @@
 package com.my.net.transporter;
 
+import com.my.filter.*;
 import com.my.net.Transporter;
 import com.my.net.codec.ProtostuffDecoder;
 import com.my.net.codec.ProtostuffEncoder;
@@ -24,6 +25,8 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,8 +85,18 @@ public class NettyTransporter implements Transporter {
     static class NettyServerHandler extends ChannelInboundHandlerAdapter {
         private final RequestHandler requestHandler;
 
+        private final Invoker filterChain; // 持有 Filter 链
+
         public NettyServerHandler(RequestHandler requestHandler) {
             this.requestHandler = requestHandler;
+            // 【核心】构建 Filter 链（可以从 SPI 加载，这里先硬编码）
+            Invoker realInvoker = FilterChainBuilder.createRealInvoker(requestHandler);
+            List<Filter> filters = Arrays.asList(
+                    new MonitorFilter(),  // 最外层：监控
+                    new LogFilter(),      // 中层：日志
+                    new AuthFilter()      // 最内层：鉴权（如果失败，后面的 Monitor/Log 不会执行，因为短路了）
+            );
+            this.filterChain = FilterChainBuilder.buildFilterChain(realInvoker, filters);
         }
 
         @Override
@@ -91,10 +104,9 @@ public class NettyTransporter implements Transporter {
             RpcRequest request = (RpcRequest) msg;
             // 提交到业务线程池，防止阻塞 Netty IO 线程
             BUSINESS_EXECUTOR.submit(() -> {
-                RpcResponse response = new RpcResponse();
+                RpcResponse response = null;
                 try {
-                    response = requestHandler.handle(request); // 假设 requestHandler 会生成 response
-                    // 这里演示需要把原本的 response 对象拿回来，根据实际业务调整
+                    response = filterChain.invoke(request);
                 } catch (Exception e) {
                     // 异常处理：让客户端知道业务执行失败
                     response = new RpcResponse();
